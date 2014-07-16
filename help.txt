@@ -1,0 +1,106 @@
+/**
+ * This is the help file for
+ * Simple connection PDO library
+ *
+ * PHP 5
+ *
+ * Copyright 2014, Seaos Corp.
+ * Developed by David Molina.
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright 2014, Seaos Corp.
+ * @link          http://seaos.co.jp
+ * @package       SimpleConnection
+ * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+
+/******************************************************************************
+					Functions for Simple connection PDO library
+******************************************************************************/
+
+->where(), ->sc_and(), ->sc_or() accepts arrays or array of arrays
+Ex: ->where(array('key', 'operator', 'value')) or
+	->where(array(array('key', 'operator', 'value', 'next'), array('key', 'operator', 'value')))
+
+	->where(array())
+	->sc_and(array())
+	->sc_or(array())
+'WHERE key=:value AND key=:value OR key:value'
+
+	->where(array(array(),array(),array()))
+	->sc_and(array(array(),array(),array()))
+	->sc_or(array(array(),array(),array()))
+'WHERE (key=:value AND key=:value OR key=:value) AND (key=:value AND key=:value OR key=:value) OR (key=:value AND key=:value OR key=:value)'
+
+
+/***************************************
+	Select a single or multiple rows on a table
+***************************************/
+Select attributes can include the fields to select and the amount of rows to fetch.
+
+The values for the fields to select can be one of the follow:
+- @string 'all' = Will select all the fields on the table
+- @string 'field1, field2, field3' = Will select only the specified fields
+- @array array('field1', 'field2', 'field3') = Will select only the specified fields
+
+The values for the rows to fetch can be one of the follow:
+- @string 'all' = Will return an array of associative arrays with all the fetched rows
+- @string 'single' = Will return a single associative array with a single fetched field, if more than one field
+	matches the query only the first one will be returned.
+
+If nothing is provided as parameters the default behaviour is to assume ->select('all', 'all')
+
+->select(fields, rows to fetch);
+Ex: $connect->select('all', 'all');
+
+
+$connect = new simpleConnection('Table name');
+$connect->select();
+
+$connect->where(array('field1','=','val1'));
+$connect->sc_and(array('field2','!=','val2'));
+$connect->sc_or(array('field3','<','val3'));
+
+$connect->set_order('ORDER BY field ASC');
+
+$result = $connect->run();
+
+
+/***************************************
+	Update the values on a table
+***************************************/
+
+
+$connect = new simpleConnection('Table name');
+
+$connect->update(array('val1'=>'val1', 'val2'=>'val2'));
+
+$connect->where(array('field1','=','val1'));
+$connect->sc_and(array('field2','!=','val2'));
+$connect->sc_or(array('field3','<','val3'));
+
+$result = $connect->run();
+
+
+/***************************************
+	Insert a new value on a table
+***************************************/
+
+
+$connect = new simpleConnection('Table name');
+$connect->insert(array('field1'=>'val1', 'field2'=>'val2', 'field3'=>'value3'));
+
+/***************************************
+	Executes a custom made query
+***************************************/
+
+$connect = new simpleConnection();
+$result = $connect->freeQuery('query string', array('key'=>'value'));
+
+
+
+
+
+
