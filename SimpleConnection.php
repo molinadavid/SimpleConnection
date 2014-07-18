@@ -1,18 +1,17 @@
 <?php
 /**
- * This is the class that controls all the queries on the DB for
  * Simple connection PDO library
  *
  * PHP 5
  *
- * Copyright 2014, Seaos Corp.
+ * Copyright 2014, David Molina.
  * Developed by David Molina.
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2014, Seaos Corp.
- * @link          http://seaos.co.jp
+ * @copyright     Copyright 2014, David Molina.
+ * @link          molinadavid@hotmail.co.uk
  * @package       SimpleConnection
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -108,8 +107,7 @@ class SimpleConnection{
 		}else if($this->validateValues($fields)){
 			$this->t_select = $fields;
 		}
-
-		
+		return $this;
 	}
 	
 	/**
@@ -119,6 +117,8 @@ class SimpleConnection{
 	*/
 	public function update($array){
 		if(is_array($array)){
+			if($this->query_type != 2){$this->query_type = 2;}
+
 			$temp_string = "";
 			foreach($array as $key=>$value){
 				$temp_key = ":".$key."_".$this->t_count;
@@ -130,7 +130,12 @@ class SimpleConnection{
 				$this->t_count ++;
 			}
 			$this->t_set = $temp_string;
+
+			return $this;
+		}else{
+			throw new Exception('The values to update must come on an array format.');
 		}
+
 	}
 	
 	/**
@@ -162,6 +167,48 @@ class SimpleConnection{
 			return $this->run();
 		}
 	}
+
+	/**
+	*	Function that handles the join part of the queries.
+	*
+	*	@param array $array, Array with the table to join and the on wich field.
+	*/
+	public function innerJoin($array) {
+		if (!is_array($array)) {
+			throw new Exception('The values to join must come on an array format.');
+		}
+		if (is_null($this->db_table)) {
+			throw new Exception('Make sure to select the main table when initiating the class.');
+		}
+		if (count($array) <> 4) {
+			throw new Exception('Make sure to include all the required parameters to join.');
+		}
+
+		$this->db_table .= ' INNER JOIN '.$array[0].' ON '.$array[1].' '.$array[2].' '.$array[3].' ';
+
+		return $this;
+	}
+
+	/**
+	*	Function that handles the left join part of the queries.
+	*
+	*	@param array $array, Array with the table to join and the on wich field.
+	*/
+	public function leftJoin($array) {
+		if (!is_array($array)) {
+			throw new Exception('The values to join must come on an array format.');
+		}
+		if (is_null($this->db_table)) {
+			throw new Exception('Make sure to select the main table when initiating the class.');
+		}
+		if (count($array) <> 4) {
+			throw new Exception('Make sure to include all the required parameters to join.');
+		}
+
+		$this->db_table .= ' LEFT JOIN '.$array[0].' ON '.$array[1].' '.$array[2].' '.$array[3].' ';
+
+		return $this;
+	}
 	
 	/**
 	*	Function that handles the query comparators.
@@ -170,7 +217,6 @@ class SimpleConnection{
 	*	@param array of arrays $values, array(array('key', 'operator', 'value', 'next'), array('key', 'operator', 'value')).
 	*/
 	public function where($values){
-		
 		if (!is_array($values)) {
 			throw new Exception('The values to query must come on an array format.');
 		}
@@ -179,14 +225,21 @@ class SimpleConnection{
 			$temp_string = '';
 			foreach ($values as $value) {
 				if (count($value) > 4 || count($value) < 3) {
-					throw new Exception('Please verify the correct format for the AND function.');
+					throw new Exception('Please verify the correct format for the WHERE function.');
 				}
-				
-				$temp_string .= ' '.$value[0].$value[1].':'.$value[0].'_'.$this->t_count;
-				$temp_key = ":".$value[0]."_".$this->t_count;
-				$temp_array = array($temp_key=>$value[2]);
-				array_push($this->query_values, $temp_array);
-				$this->t_count ++;
+				$valKey = $value[0];
+				if (strpos($valKey, '.') !== false) {
+					$valKey = str_replace(substr($valKey, 0, strpos($valKey, '.')+1), '', $valKey);
+				}
+				if (is_null($value[2]) || $value[2] === 'NULL' || $value[2] === 'null') {
+					$temp_string .= ' '.$value[0].' '.$value[1]." NULL ";
+				}else{
+					$temp_string .= ' '.$value[0].' '.$value[1].' :'.$valKey.'_'.$this->t_count;
+					$temp_key = ":".$valKey."_".$this->t_count;
+					$temp_array = array($temp_key=>$value[2]);
+					array_push($this->query_values, $temp_array);
+					$this->t_count ++;
+				}
 				
 				if (count($value) == 4) {
 					$temp_string .= ' '.$value[3];
@@ -203,19 +256,28 @@ class SimpleConnection{
 				throw new Exception('Please verify the correct format for the AND function.');
 			}
 
-			$temp_string = $values[0].$values[1].":".$values[0]."_".$this->t_count;
-			$temp_key = ":".$values[0]."_".$this->t_count;
-			if (count($values) == 3) {
-				$temp_array = array($temp_key=>$values[2]);
-			}else{
-				$temp_array = array($temp_key=>"''");
+			$valKey = $values[0];
+			if (strpos($valKey, '.') !== false) {
+				$valKey = str_replace(substr($valKey, 0, strpos($valKey, '.')+1), '', $valKey);
 			}
-			array_push($this->query_values, $temp_array);
+			
+			if (count($values) == 3 && (is_null($values[2]) || $values[2] === 'NULL' || $values[2] === 'null')) {
+				$temp_string = $values[0].' '.$values[1]." NULL ";
+			}else{
+				$temp_string = $values[0].' '.$values[1]." :".$valKey."_".$this->t_count;
+				$temp_key = ":".$valKey."_".$this->t_count;
+				if (count($values) == 3) {
+					$temp_array = array($temp_key=>$values[2]);
+				}else{
+					$temp_array = array($temp_key=>"''");
+				}
+				array_push($this->query_values, $temp_array);
+				$this->t_count ++;
+			}
 			
 			$this->t_value .= $temp_string;
-			$this->t_count ++;
 		}
-		
+		return $this;
 	}
 
 	/**
@@ -225,6 +287,7 @@ class SimpleConnection{
 	*	@param array of arrays $values, array(array('key', 'operator', 'value', 'next'), array('key', 'operator', 'value')).
 	*/
 	public function sc_and($values) {
+		
 		if (!is_array($values)) {
 			throw new Exception('The values to query must come on an array format.');
 		}
@@ -236,11 +299,19 @@ class SimpleConnection{
 					throw new Exception('Please verify the correct format for the AND function.');
 				}
 
-				$t_value .= ' '.$value[0].$value[1].':'.$value[0].'_'.$this->t_count;
-				$temp_key = ":".$value[0]."_".$this->t_count;
-				$temp_array = array($temp_key=>$value[2]);
-				array_push($this->query_values, $temp_array);
-				$this->t_count ++;
+				$valKey = $value[0];
+				if (strpos($valKey, '.') !== false) {
+					$valKey = str_replace(substr($valKey, 0, strpos($valKey, '.')+1), '', $valKey);
+				}
+				if (is_null($value[2]) || $value[2] === 'NULL' || $value[2] === 'null') {
+					$t_value .= ' '.$value[0].' '.$value[1]." NULL ";
+				}else{
+					$t_value .= ' '.$value[0].' '.$value[1].' :'.$valKey.'_'.$this->t_count;
+					$temp_key = ":".$valKey."_".$this->t_count;
+					$temp_array = array($temp_key=>$value[2]);
+					array_push($this->query_values, $temp_array);
+					$this->t_count ++;
+				}
 
 				if (count($value) == 4) {
 					$t_value .= ' '.$value[3];
@@ -256,18 +327,28 @@ class SimpleConnection{
 				throw new Exception('Please verify the correct format for the AND function.');
 			}
 
-			$temp_string = $values[0].$values[1].":".$values[0]."_".$this->t_count;
-			$temp_key = ":".$values[0]."_".$this->t_count;
-			if (count($values) == 3) {
-				$temp_array = array($temp_key=>$values[2]);
-			}else{
-				$temp_array = array($temp_key=>"''");
+			$valKey = $values[0];
+			if (strpos($valKey, '.') !== false) {
+				$valKey = str_replace(substr($valKey, 0, strpos($valKey, '.')+1), '', $valKey);
 			}
-			array_push($this->query_values, $temp_array);
+			$temp_string = '';
+			if (count($values) == 3 && (is_null($values[2]) || $values[2] === 'NULL' || $values[2] === 'null')) {
+				$temp_string = $values[0].' '.$values[1]." NULL ";
+			}else{
+				$temp_string = $values[0].' '.$values[1].' :'.$valKey.'_'.$this->t_count;
+				$temp_key = ":".$valKey."_".$this->t_count;
+				if (count($values) == 3) {
+					$temp_array = array($temp_key=>$values[2]);
+				}else{
+					$temp_array = array($temp_key=>"''");
+				}
+				array_push($this->query_values, $temp_array);
+				$this->t_count ++;
+			}
 			
 			$this->t_value .= ' AND '.$temp_string;
-			$this->t_count ++;
 		}
+		return $this;
 	}
 
 	/**
@@ -288,12 +369,20 @@ class SimpleConnection{
 					throw new Exception('Please verify the correct format for the AND function.');
 				}
 
-				$t_value .= ' '.$value[0].$value[1].':'.$value[0].'_'.$this->t_count;
-				$temp_key = ":".$value[0]."_".$this->t_count;
-				$temp_array = array($temp_key=>$value[2]);
-				array_push($this->query_values, $temp_array);
-				$this->t_count ++;
-
+				$valKey = $value[0];
+				if (strpos($valKey, '.') !== false) {
+					$valKey = str_replace(substr($valKey, 0, strpos($valKey, '.')+1), '', $valKey);
+				}
+				if (is_null($value[2]) || $value[2] === 'NULL' || $value[2] === 'null') {
+					$t_value .= ' '.$value[0].' '.$value[1]." NULL ";
+				}else{
+					$t_value .= ' '.$value[0].' '.$value[1].' :'.$valKey.'_'.$this->t_count;
+					$temp_key = ":".$valKey."_".$this->t_count;
+					$temp_array = array($temp_key=>$value[2]);
+					array_push($this->query_values, $temp_array);
+					$this->t_count ++;
+				}
+				
 				if (count($value) == 4) {
 					$t_value .= ' '.$value[3];
 				}else{
@@ -308,18 +397,29 @@ class SimpleConnection{
 				throw new Exception('Please verify the correct format for the AND function.');
 			}
 
-			$temp_string = $values[0].$values[1].":".$values[0]."_".$this->t_count;
-			$temp_key = ":".$values[0]."_".$this->t_count;
-			if (count($values) == 3) {
-				$temp_array = array($temp_key=>$values[2]);
-			}else{
-				$temp_array = array($temp_key=>"''");
+			$valKey = $values[0];
+			if (strpos($valKey, '.') !== false) {
+				$valKey = str_replace(substr($valKey, 0, strpos($valKey, '.')+1), '', $valKey);
 			}
-			array_push($this->query_values, $temp_array);
+			$temp_string = '';
+			if (count($values) == 3 && (is_null($values[2]) || $values[2] === 'NULL' || $values[2] === 'null')) {
+				$temp_string = $values[0].' '.$values[1]." NULL ";
+			}else{
+				$temp_string = $values[0].' '.$values[1]." :".$valKey."_".$this->t_count;
+
+				$temp_key = ":".$valKey."_".$this->t_count;
+				if (count($values) == 3) {
+					$temp_array = array($temp_key=>$values[2]);
+				}else{
+					$temp_array = array($temp_key=>"''");
+				}
+				array_push($this->query_values, $temp_array);
+				$this->t_count ++;
+			}
 			
 			$this->t_value .= ' OR '.$temp_string;
-			$this->t_count ++;
 		}
+		return $this;
 	}
 
 	/**
@@ -329,6 +429,7 @@ class SimpleConnection{
 	*/
 	function set_order($order){
 		$this->t_order = $order;
+		return $this;
 	}
 	
 	/**
@@ -351,7 +452,7 @@ class SimpleConnection{
 								".$this->db_table."
 							WHERE
 								".$this->t_value." ";
-				
+				//echo $query;
 				if($this->t_order){$query .= $this->t_order;}
 				
 				if($this->select_type == 1){

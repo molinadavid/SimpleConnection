@@ -5,14 +5,14 @@
  *
  * PHP 5
  *
- * Copyright 2014, Seaos Corp.
+ * Copyright 2014, David Molina.
  * Developed by David Molina.
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2014, Seaos Corp.
- * @link          http://seaos.co.jp
+ * @copyright     Copyright 2014, David Molina.
+ * @link          molinadavid@hotmail.co.uk
  * @package       SimpleConnection
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -26,10 +26,7 @@
  * TODO: You can specify multiple configurations for production, development and testing.
  *
  * datasource => The name of a supported datasource; valid options are as follows:
- *		Database/Mysql 		- MySQL 4 & 5,
- *		TODO: Database/Sqlite		- SQLite (PHP5 only),
- *		TODO: Database/Postgres	- PostgreSQL 7 and higher,
- *		TODO: Database/Sqlserver	- Microsoft SQL Server 2005 and higher
+ *		Database/Mysql 		- MySQL 4 & 5
  *
  *
  *
@@ -61,9 +58,9 @@ class SC_CONFIG {
     	'persistent' => false,
     	'host' => 'localhost',
     	'port' => '',
-    	'login' => 'seaos',
-    	'password' => 'seaos01',
-    	'database' => 'alqvmi',
+    	'login' => '<Your user name>',
+    	'password' => '<Your password>',
+    	'database' => '<Your DB>',
     	'schema' => '',
     	'prefix' => '',
     	'encoding' => 'utf8'
@@ -74,9 +71,9 @@ class SC_CONFIG {
     	'persistent' => false,
     	'host' => 'localhost',
     	'port' => '',
-    	'login' => 'seaos',
-    	'password' => 'seaos01',
-    	'database' => 'alqvmi',
+    	'login' => '<Your user name>',
+        'password' => '<Your password>',
+        'database' => '<Your DB>',
     	'schema' => '',
     	'prefix' => '',
     	'encoding' => 'utf8'

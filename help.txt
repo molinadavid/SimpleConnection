@@ -4,14 +4,14 @@
  *
  * PHP 5
  *
- * Copyright 2014, Seaos Corp.
+ * Copyright 2014, David Molina.
  * Developed by David Molina.
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2014, Seaos Corp.
- * @link          http://seaos.co.jp
+ * @copyright     Copyright 2014, David Molina.
+ * @link          molinadavid@hotmail.co.uk
  * @package       SimpleConnection
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -55,18 +55,43 @@ If nothing is provided as parameters the default behaviour is to assume ->select
 ->select(fields, rows to fetch);
 Ex: $connect->select('all', 'all');
 
+If the value on ->where(), ->sc_and() or ->sc_or() is omited it will default to an empty string.
+Ex: $connect->where(array('field1', '='))
+will be the same as:
+	SELECT *
+		FROM 'table'
+	WHERE field1 = '' 
+
 
 $connect = new simpleConnection('Table name');
-$connect->select();
-
-$connect->where(array('field1','=','val1'));
-$connect->sc_and(array('field2','!=','val2'));
-$connect->sc_or(array('field3','<','val3'));
-
-$connect->set_order('ORDER BY field ASC');
-
+$connect->select()
+		->where(array('field1','=','val1'))
+		->sc_and(array('field2','!=','val2'))
+		->sc_or(array('field3','<','val3'))
+		->set_order('ORDER BY field ASC');
 $result = $connect->run();
 
+/***************************************
+	Join tables
+***************************************/
+To Join tables select the type of join and give the parameters.
+Currently support:
+	->innerJoin(),
+	->leftJoin().
+	
+(the parameters must be given in an array)
+
+Ex: ->innerJoin(array(table2, table2.field1, '=', table1.field1'))
+
+
+$connect = new simpleConnection('table1');
+$connect->select()
+		->innerJoin(array(table2, table2.field1, '=', table1.field1'))
+		->where(array('field1','=','val1'))
+		->sc_and(array('field2','!=','val2'))
+		->sc_or(array('field3','<','val3'))
+		->set_order('ORDER BY field ASC');
+$result = $connect->run();
 
 /***************************************
 	Update the values on a table
@@ -74,13 +99,10 @@ $result = $connect->run();
 
 
 $connect = new simpleConnection('Table name');
-
-$connect->update(array('val1'=>'val1', 'val2'=>'val2'));
-
-$connect->where(array('field1','=','val1'));
-$connect->sc_and(array('field2','!=','val2'));
-$connect->sc_or(array('field3','<','val3'));
-
+$connect->update(array('val1'=>'val1', 'val2'=>'val2'))
+		->where(array('field1','=','val1'))
+		->sc_and(array('field2','!=','val2'))
+		->sc_or(array('field3','<','val3'));
 $result = $connect->run();
 
 

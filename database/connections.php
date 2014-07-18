@@ -5,15 +5,15 @@
  *
  * PHP 5
  *
- * Copyright 2014, Seaos Corp.
+ * Copyright 2014, David Molina.
  * Developed by David Molina.
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2014, Seaos Corp.
- * @link          http://seaos.co.jp
- * @package       SimpleConnection.database
+ * @copyright     Copyright 2014, David Molina.
+ * @link          molinadavid@hotmail.co.uk
+ * @package       SimpleConnection
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
