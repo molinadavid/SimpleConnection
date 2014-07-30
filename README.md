@@ -1,8 +1,4 @@
-<pre>
-    SimpleConnection
-</pre>
-
-# SimpleConnection
+# SimpleConnection #
 
 Version: 1.1
 
@@ -18,14 +14,14 @@ Version: 1.1
 4.4. Update  
 4.5. Free query 
 
-==================================================
+-------------------------------------------------
 
-### Dependecies
+### Dependencies
 
 - PHP >= 5.3
 - PDO
 
-==================================================
+-------------------------------------------------
 
 ## 1. Installing
 
@@ -35,7 +31,7 @@ Just include "SimpleConnection/SimpleConnection.php"
 require_once __DIR__.'/SimpleConnection/SimpleConnection.php';
 ```
 
-==================================================
+-------------------------------------------------
 
 ## 2. License
 
@@ -57,13 +53,13 @@ all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-==================================================
+-------------------------------------------------
 
 ## 3. Setup
 
@@ -83,7 +79,7 @@ All the relevant configurations are in 'SimpleConnection/.config.inc.php'
         'encoding' => 'utf8'
     );
 ```
-==================================================
+-------------------------------------------------
 
 ## 4. Usage:
 
@@ -128,7 +124,7 @@ FROM
 WHERE
     (id = 10 AND name != '')
 ```
-Note that if the value is omited in the array the library will assume an empty string.
+Note that if the value is omitted in the array the library will assume an empty string.
 
 
 ### 4.1. Query
@@ -179,7 +175,7 @@ OR
 ORDER BY id ASC
 ```
 
-==================================================
+-------------------------------------------------
 
 ### 4.2 Join
 
@@ -199,7 +195,7 @@ $connect->select()
 $result = $connect->run();
 ```
 
-==================================================
+-------------------------------------------------
 
 ### 4.3. Insert
 
@@ -211,7 +207,7 @@ $connect->insert(array('id'=>'10', 'name'=>'John', 'Surname'=>'Doe'));
 ```
 The insert function will return the last inserted Id when possible.
 
-==================================================
+-------------------------------------------------
 
 ### 4.4. Updating
 
@@ -225,11 +221,11 @@ $connect->update(array('id'=>'10', 'name'=>'John'))
 ```
 
 
-==================================================
+-------------------------------------------------
 
 ### 4.5. Free query
 
-As this library is still under development and is beeing improved there is a function use it with those statments that are not yet supported without compromising on the security of the PDO statments.
+As this library is still under development and is being improved there is a function use it with those statements that are not yet supported without compromising on the security of the PDO statements.
 
 ```php
 $connect = new simpleConnection();
