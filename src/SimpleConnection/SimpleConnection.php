@@ -85,7 +85,7 @@ class SimpleConnection{
 	*/
 	public function select($fields = 'all', $type = 'all'){
 		if(strtolower($type) !== 'all' && strtolower($type) !== 'single'){
-			throw new Exception('Select type invalid('.$type.') it has to be all or single');
+			throw new Exception('Invalid type['.$type.'], it has to be all or single');
 		}
 		if(strtolower($type) == 'single'){
 			if($this->select_type != 2){$this->select_type = 2;}

@@ -57,7 +57,7 @@ class SC_DBFunctions extends SC_DBConnection {
 	public function sc_select($type = 'all') {
 		
 		if ($type != 'all' && $type != 'single') {
-			throw new Exception('Select type invalid('.$type.') it has to be all or single');
+			throw new Exception('Invalid type['.$type.'], it has to be all or single');
 		}
 
 		$connection = $this->connect();
