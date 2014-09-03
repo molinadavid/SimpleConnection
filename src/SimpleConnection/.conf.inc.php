@@ -50,6 +50,7 @@
  * unix_socket =>
  * For MySQL to connect via socket specify the `unix_socket` parameter instead of `host` and `port`
  */
+date_default_timezone_set('Asia/Tokyo');
 
 class SC_CONFIG {
 	
